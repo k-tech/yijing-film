@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="一镜到底的程序动画短片：从原始森林到未来都市，96 秒。">
+<meta property="og:title" content="一镜穿越千年">
+<meta property="og:image" content="poster.jpg">
+</head>
+<body>
+<title>一镜穿越千年</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&family=Noto+Serif+SC:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one long scroll like a handscroll — film on top, the river of time under it, then the seven eras in order. */
+  :root {
+    --bg: #eef1ef;          /* river-stone paper */
+    --bg-2: #e2e8e5;
+    --ink: #17221f;
+    --mist: #5a6a66;
+    --line: rgba(23, 34, 31, 0.14);
+    --river: #1d6f7a;       /* the river, our accent */
+    --lamp: #c0612e;        /* cue marks: lantern light */
+    --frame: #fbfcfb;
+    --display: "Zhi Mang Xing", "STXingkai", "KaiTi", cursive;
+    --serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c1416; --bg-2: #142023; --ink: #e4ebe8; --mist: #93a5a1;
+      --line: rgba(228, 235, 232, 0.13); --river: #5cc3cf; --lamp: #f0a060; --frame: #18252a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1416; --bg-2: #142023; --ink: #e4ebe8; --mist: #93a5a1;
+    --line: rgba(228, 235, 232, 0.13); --river: #5cc3cf; --lamp: #f0a060; --frame: #18252a;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 16px/1.75 var(--serif);
+    padding-inline: 20px;
+    padding-block: 0 56px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; }
+
+  header { display: grid; gap: 12px; padding-top: 44px; }
+  .kicker { font: 500 12px/1.4 var(--mono); letter-spacing: 0.18em; color: var(--river); }
+  h1 { margin: 0; font: 400 clamp(52px, 10vw, 104px)/1 var(--display); letter-spacing: 0.02em; text-wrap: balance; }
+  h1 small { display: block; margin-top: 10px; font: 400 clamp(18px, 2.6vw, 24px)/1.4 var(--serif); letter-spacing: 0.3em; color: var(--mist); }
+  .logline { margin: 4px 0 0; max-width: 40em; font-size: 17px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; }
+  .meta li { font: 500 12px/1 var(--mono); letter-spacing: 0.04em; color: var(--mist); border: 1px solid var(--line); border-radius: 999px; padding: 7px 11px; }
+
+  .film { background: var(--frame); padding: clamp(6px, 1vw, 10px); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 20px 60px rgba(10, 30, 30, 0.18); }
+  .screen { position: relative; }
+  video { display: block; width: 100%; max-width: 100%; aspect-ratio: 16 / 9; background: #05080a; }
+  .loading { position: absolute; left: 50%; bottom: 14%; transform: translateX(-50%); display: grid; gap: 8px; justify-items: center; width: min(320px, 80%); padding: 12px 16px 14px; background: rgba(8, 16, 18, 0.82); border-radius: 10px; color: #e4ebe8; font-size: 14px; text-align: center; pointer-events: none; }
+  .loading .bar { width: 100%; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+  .loading .bar i { display: block; height: 100%; width: 0; background: #5cc3cf; transition: width 0.2s linear; }
+
+  /* the river of time */
+  .ruler { display: grid; gap: 8px; margin-top: -16px; }
+  .ruler svg { width: 100%; height: auto; display: block; cursor: pointer; touch-action: none; }
+  .ruler svg text { font: 500 10px var(--mono); fill: var(--mist); }
+  .readout { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--mist); }
+  .readout .tc { font: 400 13px/1.6 var(--mono); font-variant-numeric: tabular-nums; }
+  .readout .cue { color: var(--lamp); }
+  .legend { margin: 0; font-size: 13px; color: var(--mist); max-width: 60em; }
+
+  h2 { margin: 0 0 16px; font: 600 14px/1.4 var(--serif); letter-spacing: 0.3em; color: var(--river); }
+
+  .scenes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
+  .scene { width: 100%; height: 100%; display: grid; grid-template-rows: auto auto auto 1fr; gap: 4px; align-content: start; text-align: left; color: inherit; font: inherit; background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 6px 10px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+  .scene img { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 3px; display: block; margin-bottom: 4px; }
+  .scene .tc { font: 500 12px/1.4 var(--mono); color: var(--mist); font-variant-numeric: tabular-nums; }
+  .scene strong { font-weight: 600; font-size: 15px; line-height: 1.35; }
+  .scene .d { font-size: 13px; line-height: 1.6; color: var(--mist); min-width: 0; }
+  .scene:hover { background: var(--bg-2); }
+  .scene[aria-current="true"] { background: var(--bg-2); border-color: var(--river); }
+  .scene[aria-current="true"] .tc { color: var(--river); }
+  :focus-visible { outline: 2px solid var(--river); outline-offset: 3px; }
+
+  .making { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+  .making article { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
+  .glyph { font: 400 46px/1 var(--display); color: var(--river); padding-top: 2px; }
+  .making h3 { margin: 0 0 4px; font: 600 16px/1.4 var(--serif); }
+  .making p { margin: 0; font-size: 14.5px; color: var(--mist); max-width: 34em; }
+  .making div { min-width: 0; }
+
+  footer { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; color: var(--mist); font-size: 13px; border-top: 1px solid var(--line); padding-top: 22px; }
+  footer .sig { font: 400 28px/1 var(--display); color: var(--ink); }
+
+  @media (max-width: 960px) {
+    .scenes { grid-template-columns: 1fr; gap: 6px; }
+    .scene { grid-template-columns: 148px 1fr; grid-template-rows: auto auto 1fr; column-gap: 14px; row-gap: 2px; padding: 8px; }
+    .scene img { grid-row: 1 / span 3; margin: 0; }
+    .making { grid-template-columns: 1fr; gap: 22px; }
+  }
+  @media (max-width: 480px) { .scene { grid-template-columns: 112px 1fr; } .logline { font-size: 16px; } }
+  @media (prefers-reduced-motion: reduce) { .scene, .loading .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">一镜到底 · 程序生成短片</div>
+    <h1>一镜穿越千年<small>从原始森林到未来都市</small></h1>
+    <p class="logline">镜头沿着一条河一路向前，中间不剪一刀。晨雾里的巨树林变成篝火空地，再变成稻田、灯市、铁桥、霓虹，最后天亮在一座长满花园的高塔上。塔顶站着一棵树，和开头那片森林里的一样。</p>
+    <ul class="meta" aria-label="影片信息">
+      <li>96 秒</li><li>1920×1080 · 30fps</li><li>一个镜头，无剪辑</li><li>原创配乐</li><li>全片无文字</li>
+    </ul>
+  </header>
+
+  <div class="film">
+    <div class="screen">
+      <video id="v" controls playsinline preload="metadata" poster="poster.jpg"></video>
+      <div class="loading" id="loading" hidden>
+        <span id="loadmsg">正在载入影片</span>
+        <span class="bar"><i id="loadbar"></i></span>
+      </div>
+    </div>
+  </div>
+
+  <section class="ruler" aria-label="时间长河">
+    <svg id="river" viewBox="0 0 960 74" aria-hidden="true"></svg>
+    <div class="readout">
+      <span class="tc" id="pos">0:00 · 第 1 小节 / 48</span>
+      <span class="cue" id="cue">点击或拖动长河跳转</span>
+    </div>
+    <p class="legend">每一段的颜色是那个时代在片中的天色。120 BPM，每小节 2 秒，共 48 小节。实心菱形是音画同步的卡点，空心圆是三次“静音一拍”：每次换到一个更大的时代之前，声音停半秒。</p>
+  </section>
+
+  <section aria-labelledby="h-scenes">
+    <h2 id="h-scenes">七个时代</h2>
+    <ol class="scenes" id="scenes"></ol>
+  </section>
+
+  <section aria-labelledby="h-making">
+    <h2 id="h-making">怎么做的</h2>
+    <div class="making">
+      <article>
+        <div class="glyph" aria-hidden="true">镜</div>
+        <div>
+          <h3>左边是过去，右边是未来</h3>
+          <p>画面分七层视差，从远山到擦过镜头的蕨叶。每样东西属于它经过画面中心那一刻的时代，所以任何一帧里，左边总比右边早一点，远处的天际线会先长出下一个时代。</p>
+        </div>
+      </article>
+      <article>
+        <div class="glyph" aria-hidden="true">画</div>
+        <div>
+          <h3>每一帧都由代码画出</h3>
+          <p>2880 帧全部程序绘制：剪影、雾气、灯光、河面倒影都是实时算的，倒影取自水面以上的画面，翻转后加上波纹。没有任何图片素材。</p>
+        </div>
+      </article>
+      <article>
+        <div class="glyph" aria-hidden="true">乐</div>
+        <div>
+          <h3>配乐同样由代码合成</h3>
+          <p>笛子、鸟鸣、鼓、古筝、寺钟、锣、琵琶、汽笛、合成器，按时代依次登场，没有采样。D 宫五声开篇，蒸汽年代转 D 小调，80 秒天亮时升到 E 调，开头那段笛子旋律在塔顶再响一次。</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span class="sig">一镜千年</span>
+    <span>画面与音乐全部程序生成。</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  const DUR = 96, BARS = 48;
+  const SCENES = [
+    { t: 0, end: 12, name: '原始森林', d: '晨雾里的巨树和蕨丛，萤火未散，一头鹿抬起头。', img: 's1.jpg', sky: ['#2b4a7c', '#f4c99a'] },
+    { t: 12, end: 24, name: '篝火部落', d: '林间空地燃起篝火，鼓点响起，人们围着火跳舞。', img: 's2.jpg', sky: ['#3b6aa8', '#f3dcb4'] },
+    { t: 24, end: 38, name: '稻田村落', d: '水田映着天光，水车转起来，农人牵牛走过田埂。', img: 's3.jpg', sky: ['#3f7fc8', '#dcecf0'] },
+    { t: 38, end: 52, name: '古城灯市', d: '一声锣，河岸的灯笼一拍亮一盏，孔明灯升上黄昏。', img: 's4.jpg', sky: ['#3b5a98', '#f08a52'] },
+    { t: 52, end: 66, name: '蒸汽年代', d: '烟囱林立，汽笛长鸣，蒸汽火车从铁桥上开过。', img: 's5.jpg', sky: ['#3c3a44', '#b39c84'] },
+    { t: 66, end: 80, name: '霓虹都市', d: '入夜，高楼一层层亮灯，高架车流如河，烟花落进江面。', img: 's6.jpg', sky: ['#070a1a', '#3a2c5c'] },
+    { t: 80, end: 96, name: '云上未来', d: '天亮了。镜头沿着长满花园的高塔升起，塔顶站着一棵树。', img: 's7.jpg', sky: ['#3a6fb4', '#ffd6b0'] },
+  ];
+  const CUES = [
+    [1, '第一声鸟鸣'], [4, '笛声进来'], [8, '鹿抬头'], [12, '篝火燃起，鼓点进'], [14, '众人围火起舞'],
+    [24, '水车转动，筝声进'], [30, '寺钟，群鸟飞起'], [37.5, '静音一拍', 'rest'], [38, '锣声，灯笼一拍亮一盏'],
+    [44, '孔明灯升起'], [52, '机器节奏进'], [54, '汽笛，火车上桥'], [65.5, '静音一拍', 'rest'], [66, '全城一层层亮灯'],
+    [72, '烟花三响'], [79.5, '静音一拍', 'rest'], [80, '升到 E 调，天亮'], [85, '镜头开始升起'],
+    [90, '塔顶的树，和开头那棵一样'], [92, '鸟群起飞'], [94, '淡出'],
+  ];
+  const v = document.getElementById('v');
+
+  // ---- video source: WebKit only plays from servers that answer byte ranges, so it gets an in-memory copy
+  const FILM = 'film.mp4';
+  const ua = navigator.userAgent;
+  const isWebKit = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(ua) || /iP(hone|ad|od)/.test(ua);
+  const loading = document.getElementById('loading'), loadmsg = document.getElementById('loadmsg'), loadbar = document.getElementById('loadbar');
+  let usedBlob = false, fetching = false, pending = null;
+  async function loadBlob(silent) {
+    if (usedBlob) return;
+    usedBlob = true; fetching = true; silent = silent === true;
+    if (!silent) { v.removeAttribute('src'); loading.hidden = false; loadmsg.textContent = '正在载入影片'; }
+    try {
+      const res = await fetch(FILM, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      let blob;
+      if (res.body && res.body.getReader) {
+        const total = Number(res.headers.get('content-length')) || 14000000;
+        const reader = res.body.getReader(), chunks = [];
+        let got = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value); got += value.length;
+          const pct = Math.min(99, Math.round((got / total) * 100));
+          if (!silent) { loadmsg.textContent = `正在载入影片 ${pct}%`; loadbar.style.width = pct + '%'; }
+        }
+        blob = new Blob(chunks, { type: 'video/mp4' });
+      } else blob = new Blob([await res.arrayBuffer()], { type: 'video/mp4' });
+      const t = v.currentTime || 0, wasPlaying = silent && !v.paused;
+      v.src = URL.createObjectURL(blob); v.load(); fetching = false;
+      v.addEventListener('loadedmetadata', () => {
+        const p = pending; pending = null;
+        const to = p ? p.t : t;
+        if (to > 0) v.currentTime = to;
+        if (p ? p.play : wasPlaying) v.play().catch(() => {});
+        update();
+      }, { once: true });
+      loading.hidden = true;
+    } catch (e) {
+      fetching = false;
+      if (silent) { pending = null; loading.hidden = true; update(); return; }
+      loadmsg.textContent = '影片没能载入，请刷新页面再试。'; loadbar.style.width = '0';
+    }
+  }
+  if (isWebKit) loadBlob();
+  else {
+    v.src = FILM;
+    v.addEventListener('error', () => { usedBlob = false; loadBlob(); }, { once: true });
+    v.addEventListener('loadedmetadata', () => { const n = v.seekable.length; if (!n || v.seekable.end(n - 1) < v.duration - 1) loadBlob(true); }, { once: true });
+    setTimeout(() => { if (!usedBlob && v.readyState < 1) loadBlob(); }, 8000);
+  }
+
+  // ---- the river of time
+  const svg = document.getElementById('river'), NS = 'http://www.w3.org/2000/svg';
+  const X = (t) => (t / DUR) * 960;
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || svg).appendChild(e); return e; };
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const defs = el('defs', {});
+  SCENES.forEach((s, i) => {
+    const gr = el('linearGradient', { id: 'sky' + i, x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+    el('stop', { offset: 0, 'stop-color': s.sky[0] }, gr); el('stop', { offset: 1, 'stop-color': s.sky[1] }, gr);
+    el('rect', { x: X(s.t) + 0.5, y: 24, width: X(s.end - s.t) - 1, height: 20, rx: 2, fill: `url(#sky${i})` });
+    const lab = el('text', { x: X(s.t) + 3, y: 70 }); lab.textContent = s.name;
+  });
+  const prog = el('rect', { x: 0, y: 46, width: 0, height: 3, rx: 1.5, fill: css('--river') });
+  for (let b = 0; b <= BARS; b++) el('line', { x1: X(b * 2), x2: X(b * 2), y1: 51, y2: SCENES.some((s) => s.t === b * 2) ? 59 : 55, stroke: css('--mist'), 'stroke-opacity': 0.55, 'stroke-width': 1, 'vector-effect': 'non-scaling-stroke' });
+  CUES.forEach(([t, , kind]) => {
+    if (kind === 'rest') el('circle', { cx: X(t), cy: 13, r: 4, fill: 'none', stroke: css('--lamp'), 'stroke-width': 1.6, 'vector-effect': 'non-scaling-stroke' });
+    else el('path', { d: `M${X(t)} 8 L${X(t) + 4.5} 13 L${X(t)} 18 L${X(t) - 4.5} 13 Z`, fill: css('--lamp') });
+  });
+  const head = el('line', { x1: 0, x2: 0, y1: 4, y2: 60, stroke: css('--ink'), 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke' });
+  function recolor() { prog.setAttribute('fill', css('--river')); head.setAttribute('stroke', css('--ink')); }
+  try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolor); new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); } catch (e) {}
+
+  // ---- scene list
+  const list = document.getElementById('scenes');
+  const fmt = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+  const buttons = SCENES.map((s) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.className = 'scene'; b.type = 'button';
+    b.innerHTML = `<img src="${s.img}" alt="" loading="lazy"><span class="tc">${fmt(s.t)}</span><strong>${s.name}</strong><span class="d">${s.d}</span>`;
+    b.addEventListener('click', () => seek(s.t + 0.01, true));
+    li.appendChild(b); list.appendChild(li); return b;
+  });
+
+  const seekableAt = (t) => { for (let i = 0; i < v.seekable.length; i++) if (t >= v.seekable.start(i) && t <= v.seekable.end(i) + 0.05) return true; return false; };
+  function seek(t, play) {
+    t = Math.max(0, Math.min(DUR - 0.05, t));
+    if (fetching && !seekableAt(t)) { pending = { t, play: !!play || (pending ? pending.play : !v.paused) }; v.pause(); loading.hidden = false; update(); return; }
+    try { v.currentTime = t; } catch (e) {}
+    if (play) v.play().catch(() => {});
+    update();
+  }
+  const pos = document.getElementById('pos'), cueEl = document.getElementById('cue');
+  let lastScene = -1;
+  function update() {
+    const t = pending ? pending.t : (v.currentTime || 0);
+    head.setAttribute('x1', X(t)); head.setAttribute('x2', X(t)); prog.setAttribute('width', X(t));
+    pos.textContent = `${fmt(t)} · 第 ${Math.min(BARS, Math.floor(t / 2) + 1)} 小节 / ${BARS}`;
+    const recent = CUES.filter(([c]) => c <= t + 0.05 && t - c < 2.2).pop();
+    cueEl.textContent = recent ? recent[1] : (t < 0.1 ? '点击或拖动长河跳转' : '');
+    const si = SCENES.findIndex((s) => t >= s.t && t < s.end);
+    if (si !== lastScene) { buttons.forEach((b, i) => b.setAttribute('aria-current', i === si && t > 0.05 ? 'true' : 'false')); lastScene = si; }
+  }
+  let raf = 0;
+  const loop = () => { update(); raf = v.paused ? 0 : requestAnimationFrame(loop); };
+  v.addEventListener('play', () => { if (!raf) raf = requestAnimationFrame(loop); });
+  ['timeupdate', 'seeked', 'pause'].forEach((e) => v.addEventListener(e, update));
+  let dragging = false;
+  const toTime = (ev) => { const r = svg.getBoundingClientRect(); return ((ev.clientX - r.left) / r.width) * DUR; };
+  svg.addEventListener('pointerdown', (ev) => { dragging = true; svg.setPointerCapture(ev.pointerId); seek(toTime(ev)); });
+  svg.addEventListener('pointermove', (ev) => { if (dragging) seek(toTime(ev)); });
+  svg.addEventListener('pointerup', () => { dragging = false; });
+  update();
+})();
+</script>
+
+</body>
+</html>
